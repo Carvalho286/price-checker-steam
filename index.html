@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Steam Price Checker</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Steam Market Price Checker</h1>
+    <form id="searchForm">
+      <label for="gameId">Enter game id:</label>
+      <input type="number" id="gameId" required />
+      <label for="itemName">Enter item name:</label>
+      <input type="text" id="itemName" required />
+      <button type="submit">Check Price</button>
+    </form>
+
+    <script>
+      document
+        .getElementById("searchForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const game = encodeURIComponent(
+            document.getElementById("gameId").value.trim()
+          );
+          const item = encodeURIComponent(
+            document.getElementById("itemName").value.trim()
+          );
+          window.location.href = `price.html?game=${game}&item=${item}`;
+        });
+    </script>
+  </body>
+</html>

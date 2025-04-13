@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Item Price</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Item Price Info</h1>
+    <div id="output">Loading...</div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const game = params.get("game");
+      const item = params.get("item");
+
+      async function fetchData() {
+        const proxy = "https://corsproxy.io/?";
+        const url = `${proxy}https://steamcommunity.com/market/priceoverview/?country=PT&currency=3&appid=${game}&market_hash_name=${item}`;
+
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.success) {
+            document.getElementById("output").innerHTML = `
+        <p><strong>Lowest Price:</strong> ${data.lowest_price}</p>
+        <p><strong>Volume:</strong> ${data.volume}</p>
+        <p><strong>Median Price:</strong> ${data.median_price}</p>
+      `;
+          } else {
+            document.getElementById("output").textContent =
+              "Failed to fetch data.";
+          }
+        } catch (error) {
+          document.getElementById("output").textContent =
+            "Error fetching data.";
+        }
+      }
+
+      fetchData();
+      setInterval(fetchData, 10000); // refresh every 10 seconds
+    </script>
+  </body>
+</html>
