@@ -6,7 +6,113 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Steam Market Price Checker</h1>
+    <h2 style="font-family: Arial; text-align: center; margin-bottom: 20px">
+      Price Information - Stickers Austin 2025
+    </h2>
+
+    <div
+      id="cardsContainer"
+      style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center"
+    ></div>
+
+    <div
+      id="totals"
+      style="
+        max-width: 400px;
+        margin: 30px auto 0;
+        padding: 20px;
+        background: #222;
+        color: white;
+        border-radius: 12px;
+        font-family: Arial;
+        text-align: center;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+      "
+    >
+      <h3>Total (Lowest Prices)</h3>
+      <p id="total" style="font-size: 1.5em; margin: 5px 0">0 €</p>
+      <h4>After Steam Tax (15%)</h4>
+      <p
+        id="totalAfterTax"
+        style="font-size: 1.3em; margin: 5px 0; color: #f39c12"
+      >
+        0 €
+      </p>
+    </div>
+
+    <script>
+      const APPID = 730;
+      const CURRENCY = 3;
+      const COUNTRY = "PT";
+      const proxy = "https://corsproxy.io/?";
+
+      const items = [
+        { name: "Sticker | TYLOO (Holo) | Austin 2025", qty: 1 },
+        { name: "Sticker | OG (Holo) | Austin 2025", qty: 2 },
+        { name: "Sticker | TYLOO (Foil) | Austin 2025", qty: 2 },
+        { name: "Sticker | NRG (Holo) | Austin 2025", qty: 2 },
+        { name: "Sticker | Chinggis Warriors (Foil) | Austin 2025", qty: 2 },
+      ];
+
+      let totalPrice = 0;
+
+      async function fetchData(item) {
+        const url = `${proxy}https://steamcommunity.com/market/priceoverview/?country=${COUNTRY}&currency=${CURRENCY}&appid=${APPID}&market_hash_name=${encodeURIComponent(
+          item.name
+        )}`;
+
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.success) {
+            const numericPrice = parseFloat(
+              data.lowest_price.replace("€", "").replace(",", ".").trim()
+            );
+            const totalItemPrice = numericPrice * item.qty;
+            totalPrice += totalItemPrice;
+
+            document.getElementById("cardsContainer").innerHTML += `
+          <div style="background: white; border-radius: 12px; padding: 15px; width: 250px; font-family: Arial; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+            <h3 style="font-size: 1em; color: #333; margin-bottom: 10px;">${
+              item.name
+            }</h3>
+            <p><strong>Quantity:</strong> ${item.qty}</p>
+            <p><strong>Lowest Price:</strong> ${data.lowest_price}</p>
+            <p><strong>Total Price:</strong> ${totalItemPrice.toFixed(2)} €</p>
+          </div>
+        `;
+
+            document.getElementById("total").innerText = `${totalPrice.toFixed(
+              2
+            )} €`;
+            document.getElementById("totalAfterTax").innerText = `${(
+              totalPrice * 0.85
+            ).toFixed(2)} €`;
+          } else {
+            document.getElementById("cardsContainer").innerHTML += `
+          <div style="background: #ffdddd; border-radius: 12px; padding: 15px; width: 250px; font-family: Arial; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+            <h3 style="font-size: 1em; color: #333; margin-bottom: 10px;">${item.name}</h3>
+            <p>❌ Failed to fetch</p>
+          </div>
+        `;
+          }
+        } catch (error) {
+          document.getElementById("cardsContainer").innerHTML += `
+        <div style="background: #ffdddd; border-radius: 12px; padding: 15px; width: 250px; font-family: Arial; box-shadow: 0px 4px 12px rgba(0,0,0,0.1);">
+          <h3 style="font-size: 1em; color: #333; margin-bottom: 10px;">${item.name}</h3>
+          <p>⚠️ Error fetching</p>
+        </div>
+      `;
+        }
+      }
+
+      items.forEach(fetchData);
+    </script>
+    <hr />
+    <h2 style="font-family: Arial; text-align: center; margin-bottom: 20px">
+      Price checker
+    </h2>
     <form id="searchForm">
       <label for="gameId">Enter game id:</label>
       <input type="number" id="gameId" required />
